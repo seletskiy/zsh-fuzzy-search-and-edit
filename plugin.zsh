@@ -11,11 +11,10 @@ function :fuzzy-search-and-edit:get-files() {
 }
 
 function :fuzzy-search-and-edit:abort-job() {
-    while read match; do
-        echo $match
+    read match
+    echo $match
 
-        async_stop_worker fuzzy-search-and-edit:worker
-    done
+    async_flush_jobs ":fuzzy-search-and-edit:worker"
 }
 
 function fuzzy-search-and-edit() {
@@ -44,7 +43,13 @@ function fuzzy-search-and-edit() {
     zle -I
 }
 
+:fuzzy-search-and-edit:completed() {
+    :
+}
+
 async_start_worker ":fuzzy-search-and-edit:worker"
+async_register_callback ":fuzzy-search-and-edit:worker" \
+    ":fuzzy-search-and-edit:completed"
 
 zle -N fuzzy-search-and-edit
 
