@@ -3,7 +3,7 @@
 It's a plugin for zsh, which offers widget for fuzzy searching and instantly
 opening matched file on matched line.
 
-![fuzzy-search-and-edit](https://cloud.githubusercontent.com/assets/674812/16119178/2c878e28-33fc-11e6-89a7-76b4b8b46ca6.gif)
+![fuzzy-search-and-edit](https://cloud.githubusercontent.com/assets/674812/16119705/79da30a2-33fe-11e6-9827-416c961a8b5f.gif)
 
 # Requirements
 
