@@ -4,21 +4,16 @@ function :fuzzy-search-and-edit:get-files() {
 
     cd "$directory"
 
-    exec 2>>/tmp/debug
-
-    set -x
-
     command grep -r -nPHI '\w' -r "." --exclude-dir=".git" \
         | cut -b3- \
         | command sed -ru 's/^([^:]+:[^:]+):\s*(.*)/\x1b[35m\1\x1b[0m:  \2/' \
         > "$fifo"
-
-    set +x
 }
 
 function :fuzzy-search-and-edit:abort-job() {
     while read match; do
         echo $match
+
         async_stop_worker fuzzy-search-and-edit:worker
     done
 }
@@ -32,7 +27,10 @@ function fuzzy-search-and-edit() {
     async_job ":fuzzy-search-and-edit:worker" \
         ":fuzzy-search-and-edit:get-files" "$(pwd)" "$fifo"
 
-    local match=$(fzf --ansi -1 < "$fifo" | :fuzzy-search-and-edit:abort-job)
+    local match=$(
+        fzf +x --ansi -1 < "$fifo" \
+            | :fuzzy-search-and-edit:abort-job
+    )
 
     if [ "$match" ]; then
         local file="$(cut -f1 -d: <<< "$match")"
