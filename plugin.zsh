@@ -34,8 +34,10 @@ function fuzzy-search-and-edit() {
     )
 
     if [ "$match" ]; then
-        local file="$(cut -f1 -d: <<< "$match")"
-        local line="$(cut -f2 -d: <<< "$match")"
+        local file
+        local line
+
+        IFS=: read -r file line _ <<< "$match"
 
         $EDITOR "$file" "+$line" < /dev/tty
     fi
