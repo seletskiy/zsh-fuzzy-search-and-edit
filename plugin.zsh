@@ -39,7 +39,7 @@ function fuzzy-search-and-edit() {
 
         IFS=: read -r file line _ <<< "$match"
 
-        $EDITOR "$file" "+$line" < /dev/tty
+        "${=EDITOR}" "$file" "+$line" < /dev/tty
     fi
 
     rm -r "$dir"
