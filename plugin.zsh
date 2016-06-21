@@ -4,7 +4,7 @@ function :fuzzy-search-and-edit:get-files() {
 
     cd "$directory"
 
-    command grep -r -nPHI '\w' -r "." --exclude-dir=".git" \
+    command grep -r -nEHI '[[:alnum:]]' "." --exclude-dir=".git" \
         | cut -b3- \
         | command sed -ru 's/^([^:]+:[^:]+):\s*(.*)/\x1b[35m\1\x1b[0m:  \2/' \
         > "$fifo"
