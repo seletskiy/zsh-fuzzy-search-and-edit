@@ -11,8 +11,10 @@ function :fuzzy-search-and-edit:get-files() {
 }
 
 function :fuzzy-search-and-edit:abort-job() {
-    read match
-    echo $match
+    local match
+
+    read -r match
+    printf "%s\n" "$match"
 
     async_flush_jobs ":fuzzy-search-and-edit:worker"
 }
