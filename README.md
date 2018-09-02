@@ -8,7 +8,7 @@ opening matched file on matched line.
 # Requirements
 
 * [fzf](https://github.com/junegunn/fzf);
-* [zsh-async](https://github.com/junegunn/fzf);
+* [zsh-async](https://github.com/mafredri/zsh-async);
 
 # Installation
 
