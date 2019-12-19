@@ -47,7 +47,70 @@ function fuzzy-search-and-edit() {
 
         IFS=: read -r file line _ <<< "$match"
 
-        "${=EDITOR}" "+$line" "$file" < /dev/tty
+        # set defaults for the editor opening
+        local editortouse='${EDITOR}'
+        local linefmt="+%L"
+        local filefmt="%F"
+        local usetty=true
+
+        # high level options
+        if zstyle -t ':fuzzy-search-and-edit:editor' use-visual ; then
+            usetty=false
+            # only if VISUAL_EDITOR variable is set
+            if [ -v VISUAL_EDITOR ] ; then
+                editortouse='${VISUAL_EDITOR}'
+            fi
+            # else keep the default
+        fi
+        if zstyle -t ':fuzzy-search-and-edit:editor' alternate-line-syntax ; then
+            linefmt=""
+            filefmt="%F:%L"
+        fi
+
+        local tmpval=''
+        # low-level options that will override all others
+        if zstyle -s ':fuzzy-search-and-edit:editor:invocation-format' editor tmpval ; then
+            editortouse="${tmpval}"
+        fi
+        if zstyle -s ':fuzzy-search-and-edit:editor:invocation-format' line tmpval ; then
+            linefmt="${tmpval}"
+        fi
+        if zstyle -s ':fuzzy-search-and-edit:editor:invocation-format' file tmpval ; then
+            filefmt="${tmpval}"
+        fi
+        if zstyle -t ':fuzzy-search-and-edit:editor:invocation-format' without-tty ; then
+            usetty=false
+        fi
+
+        # parse the file and line format specifiers
+        local linetouse=""
+        local filetouse=""
+        zformat -f linetouse "${linefmt}" L:${line} F:${file}
+        zformat -f filetouse "${filefmt}" L:${line} F:${file}
+
+        # construct the command-line.
+        local cmdtorun=()
+
+        # split the full expansion of editortouse and put each space separated argument into the array separately
+        for A in ${(z)${(e)editortouse}} ; do
+            cmdtorun+=(${A})
+        done
+
+        # append the options only if they aren't blank to avoid cases that don't parse properly like:
+        # myeditor "" "myfile.txt:80"
+        if [ -n "${linetouse}" ] ; then
+            cmdtorun+=(${linetouse})
+        fi
+        if [ -n "${filetouse}" ] ; then
+            cmdtorun+=(${filetouse})
+        fi
+
+        # run it, quoting each array element and providing tty if necessary
+        if ${usetty} ; then
+            "${cmdtorun[@]}" </dev/tty
+        else
+            "${cmdtorun[@]}"
+        fi
     fi
 
     rm -r "$dir"
